@@ -17,6 +17,8 @@ library(ggwordcloud)
 library(grid)
 library(gridExtra)
 library(png)
+library(gtable)
+library(patchwork)
 
 
 ########## Main script #####
@@ -281,6 +283,7 @@ for( i in 1:6 ){
   rm(tmp, tmp_yr, duration_plot, x_min, x_max)
 }
 
+
 # Path to your map image
 map_path <- "~/Downloads/map.png"  # Adjust the path accordingly
 
@@ -289,75 +292,81 @@ map_image <- readPNG(map_path)
 
 
 # Create a rasterGrob
-map_grob <- rasterGrob(map_image, width = unit(1, "npc"), height = unit(1, "npc"))
+map_grob <- rasterGrob(map_image, width = unit(3, "in"), height = unit(4, "in"))
 
 # Create the textGrob
 text_grob <- textGrob(
   "Diary of a Jogger",
-  gp = gpar(fontface = c("bold", 'italic'), fontsize = 24, col = "white"),  # Make the text bold, larger font size, and white color for visibility
+  gp = gpar(fontface = c("bold"), fontsize = 24, col = "black"),  # Make the text bold, larger font size, and white color for visibility
   hjust = 0.5,  # Center horizontally
   vjust = 0.5  # Center vertically
 )
 
 # Combine the map_grob and text_grob
-combined_grob <- grid.arrange(map_grob, text_grob, ncol = 1)
+combined_grob <- grobTree(map_grob, text_grob)
+combined_grob <- ggplotify::as.ggplot(combined_grob)
+
+# row1 <- list(plot_1990, plot_1991, plot_1992, plot_1993, plot_1994, plot_1995)
+# row3 <- list(plot_1996, plot_1997, plot_1998, plot_1999, plot_2000, plot_2001)
+# row5 <- list(plot_2002, plot_2003, plot_2004, plot_2005, plot_2006, plot_2007)
+# row7 <- list(plot_2008, plot_2009, plot_2010, plot_2011, plot_2012, plot_2013)
+# row9 <- list(plot_2014, plot_2015, plot_2016, plot_2017, plot_2018, plot_2019)
+# 
+# # Add the combined grob to the plot list (span across rows 11 and 12)
+# row11 <- list(plot_2020, plot_2021, plot_2022, plot_2023, plot_2024, combined_grob)
+# 
+# row2 <- list(dur_1990)
+# row4 <- list(dur_1996)
+# row6 <- list(dur_2002)
+# row8 <- list(dur_2008)
+# row10 <- list(dur_2014)
+# row12 <- list(dur_2020)
+# 
+# plot_lists <- list(row1, row2, row3, row4, row5, row6, row7, row8, row9, row10, row11, row12)
+# 
+# # Flatten the list of lists for grid.arrange, ensuring single plots span the entire width
+# all_plots <- list()
+# for (i in seq_along(plot_lists)) {
+#   all_plots <- c(all_plots, plot_lists[[i]])
+# }
+# 
+# # Adjust layout matrix to span combined_grob across rows 11 and 12
+# layout <- rbind(c(seq(1, 6)),
+#                 c(rep(7, 6)),
+#                 c(seq(8, 13)),
+#                 c(rep(14, 6)),
+#                 c(seq(15, 20)),
+#                 c(rep(21, 6)),
+#                 c(seq(22, 27)),
+#                 c(rep(28, 6)),
+#                 c(seq(29, 34)),
+#                 c(rep(35, 6)),
+#                 c(seq(36, 40), 41),
+#                 c(rep(42, 5), 41))
+# 
+# heights <- c(rep(c(3, 1), 6))
 
 
-
-row1 <- list(plot_1990, plot_1991, plot_1992, plot_1993, plot_1994, plot_1995)
-row3 <- list(plot_1996, plot_1997, plot_1998, plot_1999, plot_2000, plot_2001)
-row5 <- list(plot_2002, plot_2003, plot_2004, plot_2005, plot_2006, plot_2007)
-row7 <- list(plot_2008, plot_2009, plot_2010, plot_2011, plot_2012, plot_2013)
-row9 <- list(plot_2014, plot_2015, plot_2016, plot_2017, plot_2018, plot_2019)
-row11<- list(plot_2020, plot_2021, plot_2022, plot_2023, plot_2024, combined_grob)
-
-row2 <- list(dur_1990)
-row4 <- list(dur_1996)
-row6 <- list(dur_2002)
-row8 <- list(dur_2008)
-row10 <- list(dur_2014)
-row12 <- list(dur_2020)
-
-
-
-plot_lists <- list(row1, row2, row3, row4, row5, row6,
-                   row7, row8, row9, row10, row11, row12)
-
-# Flatten the list of lists for grid.arrange, ensuring single plots span the entire width
-all_plots <- list()
-for (i in seq_along(plot_lists)) {
-  if (i %% 2 == 0) {  # Rows 2, 4, 6, 8, 10, 12
-    all_plots <- c(all_plots, plot_lists[[i]], NULL, NULL, NULL, NULL, NULL)
-  } else {  # Rows 1, 3, 5, 7, 9, 11
-    all_plots <- c(all_plots, plot_lists[[i]])
-  }
-}
-
-layout <- rbind(c(seq(1,6)),
-                c(rep(7,6)),
-                c(seq(8,13)),
-                c(rep(14,6)),
-                c(seq(15,20)),
-                c(rep(21,6)),
-                c(seq(22,27)),
-                c(rep(28,6)),
-                c(seq(29,34)),
-                c(rep(35,6)),
-                c(seq(36,40),41),
-                c(rep(42, 5 ),41))
-
-heights <- rep(c(3,1),6)
-
-
+# Combine the plots using patchwork
+layout <- (
+  (plot_1990 | plot_1991 | plot_1992 | plot_1993 | plot_1994 | plot_1995) / 
+    (dur_1990) /
+    (plot_1996 | plot_1997 | plot_1998 | plot_1999 | plot_2000 | plot_2001) / 
+    (dur_1996) /
+    (plot_2002 | plot_2003 | plot_2004 | plot_2005 | plot_2006 | plot_2007) / 
+    (dur_2002) /
+    (plot_2008 | plot_2009 | plot_2010 | plot_2011 | plot_2012 | plot_2013) / 
+    (dur_2008) /
+    (plot_2014 | plot_2015 | plot_2016 | plot_2017 | plot_2018 | plot_2019) / 
+    (dur_2014) /
+    (plot_2020 | plot_2021 | plot_2022 | plot_2023 | plot_2024 /dur_2020) | combined_grob) +
+  plot_layout(ncol = 6, heights = c(rep(c(3, 1), 5), 4))
 
 # Create the layout
-#png(file.path('C:/Users/vidon/Downloads',"large_layout.png"), width = 24, height = 25, units = "in", res = 300)
-#pdf(file.path('C:/Users/vidon/Downloads',"large_layout.pdf"), width = 24, height = 25)
-
-pdf(file.path('~/Downloads',"large_layout.pdf"), width = 24, height = 25)
-
-grid.arrange(grobs = all_plots, ncol = 6, nrow = 12,
-             layout_matrix = layout,
-             heights = unit(heights, "in"))
-
+pdf(file.path('~/Downloads', "large_layout.pdf"), width = 24, height = 25)
+#grid.arrange(grobs = all_plots, ncol = 6, nrow = 12,
+#             layout_matrix = layout,
+#             heights = unit(heights, "in"))
+print(layout)
 dev.off()
+
