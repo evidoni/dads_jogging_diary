@@ -23,7 +23,8 @@ library(patchwork)
 
 ########## Main script #####
 #file_path <- "C:/Users/vidon/Downloads/24 May 26,2024 RUN DIARY copy 3.txt"
-file_path <- "~/Downloads/24 May 26,2024 RUN DIARY copy 3.txt"
+base <- "C:/Users/vidon/Downloads"
+file_path <- file.path(base,"24 May 26,2024 RUN DIARY copy 3.txt")
 data <- readLines(file_path)
 data <- data[nzchar(data)]
 df <- data.frame(stringsAsFactors = FALSE)
@@ -285,7 +286,7 @@ for( i in 1:6 ){
 
 
 # Path to your map image
-map_path <- "~/Downloads/map.png"  # Adjust the path accordingly
+map_path <- file.path(base,"map.png")  # Adjust the path accordingly
 
 # Load the map image
 map_image <- readPNG(map_path)
@@ -297,10 +298,11 @@ map_grob <- rasterGrob(map_image, width = unit(3, "in"), height = unit(4, "in"))
 # Create the textGrob
 text_grob <- textGrob(
   "Diary of a Jogger",
-  gp = gpar(fontface = c("bold"), fontsize = 24, col = "black"),  # Make the text bold, larger font size, and white color for visibility
+  gp = gpar(fontface = c("bold", "italic"), fontsize = 24, col = "black"),  # Make the text bold, italic, larger font size, and white color for visibility
   hjust = 0.5,  # Center horizontally
   vjust = 0.5  # Center vertically
 )
+
 
 # Combine the map_grob and text_grob
 combined_grob <- grobTree(map_grob, text_grob)
@@ -347,26 +349,53 @@ combined_grob <- ggplotify::as.ggplot(combined_grob)
 # heights <- c(rep(c(3, 1), 6))
 
 
-# Combine the plots using patchwork
-layout <- (
-  (plot_1990 | plot_1991 | plot_1992 | plot_1993 | plot_1994 | plot_1995) / 
-    (dur_1990) /
-    (plot_1996 | plot_1997 | plot_1998 | plot_1999 | plot_2000 | plot_2001) / 
-    (dur_1996) /
-    (plot_2002 | plot_2003 | plot_2004 | plot_2005 | plot_2006 | plot_2007) / 
-    (dur_2002) /
-    (plot_2008 | plot_2009 | plot_2010 | plot_2011 | plot_2012 | plot_2013) / 
-    (dur_2008) /
-    (plot_2014 | plot_2015 | plot_2016 | plot_2017 | plot_2018 | plot_2019) / 
-    (dur_2014) /
-    (plot_2020 | plot_2021 | plot_2022 | plot_2023 | plot_2024 /dur_2020) | combined_grob) +
-  plot_layout(ncol = 6, heights = c(rep(c(3, 1), 5), 4))
 
-# Create the layout
-pdf(file.path('~/Downloads', "large_layout.pdf"), width = 24, height = 25)
-#grid.arrange(grobs = all_plots, ncol = 6, nrow = 12,
-#             layout_matrix = layout,
-#             heights = unit(heights, "in"))
-print(layout)
+# Combine the plots using patchwork with specific areas
+
+    plot_1990 + plot_1991 + plot_1992 + plot_1993 + plot_1994 + plot_1995 + 
+    dur_1990 +
+    plot_1996 + plot_1997 + plot_1998 + plot_1999 + plot_2000 + plot_2001 +
+    dur_1996 +
+    plot_2002 + plot_2003 + plot_2004 + plot_2005 + plot_2006 + plot_2007 +
+    dur_2002 +
+    plot_2008 + plot_2009 + plot_2010 + plot_2011 + plot_2012 + plot_2013 +
+    dur_2008 +
+    plot_2014 + plot_2015 + plot_2016 + plot_2017 + plot_2018 + plot_2019 +
+    dur_2014 +
+    plot_2020 + plot_2021 + plot_2022 + plot_2023 + plot_2024 + combined_grob +
+    dur_2020
+
+
+layout <- c(
+  area(1, 1), area(1, 2), area(1, 3), area(1, 4), area(1, 5), area(1, 6), 
+  area(2,1,2,6),
+  area(3, 1), area(3, 2), area(3, 3), area(3, 4), area(3, 5), area(3, 6), 
+  area(4,1,4,6),
+  area(5, 1), area(5, 2), area(5, 3), area(5, 4), area(5, 5), area(5, 6), 
+  area(6,1,6,6),
+  area(7, 1), area(7, 2), area(7, 3), area(7, 4), area(7, 5), area(7, 6), 
+  area(8,1,8,6),
+  area(9, 1), area(9, 2), area(9, 3), area(9, 4), area(9, 5), area(9, 6), 
+  area(10,1,10,6),
+  area(11, 1), area(11, 2), area(11, 3), area(11, 4), area(11, 5), area(11, 6, 12, 6),  
+  area(12,1,12,5))
+
+all_combined <-    
+  plot_1990 + plot_1991 + plot_1992 + plot_1993 + plot_1994 + plot_1995 + 
+  dur_1990 +
+  plot_1996 + plot_1997 + plot_1998 + plot_1999 + plot_2000 + plot_2001 +
+  dur_1996 +
+  plot_2002 + plot_2003 + plot_2004 + plot_2005 + plot_2006 + plot_2007 +
+  dur_2002 +
+  plot_2008 + plot_2009 + plot_2010 + plot_2011 + plot_2012 + plot_2013 +
+  dur_2008 +
+  plot_2014 + plot_2015 + plot_2016 + plot_2017 + plot_2018 + plot_2019 +
+  dur_2014 +
+  plot_2020 + plot_2021 + plot_2022 + plot_2023 + plot_2024 + combined_grob +
+  dur_2020 + plot_layout(design = layout, 
+                          widths = c(1), heights = rep(c(3,1),6))
+
+# Save the combined plot to a PDF file
+pdf(file.path(base, "large_layout.pdf"), width = 24, height = 25)
+print(all_combined)
 dev.off()
-
