@@ -352,20 +352,6 @@ combined_grob <- ggplotify::as.ggplot(combined_grob)
 
 # Combine the plots using patchwork with specific areas
 
-    plot_1990 + plot_1991 + plot_1992 + plot_1993 + plot_1994 + plot_1995 + 
-    dur_1990 +
-    plot_1996 + plot_1997 + plot_1998 + plot_1999 + plot_2000 + plot_2001 +
-    dur_1996 +
-    plot_2002 + plot_2003 + plot_2004 + plot_2005 + plot_2006 + plot_2007 +
-    dur_2002 +
-    plot_2008 + plot_2009 + plot_2010 + plot_2011 + plot_2012 + plot_2013 +
-    dur_2008 +
-    plot_2014 + plot_2015 + plot_2016 + plot_2017 + plot_2018 + plot_2019 +
-    dur_2014 +
-    plot_2020 + plot_2021 + plot_2022 + plot_2023 + plot_2024 + combined_grob +
-    dur_2020
-
-
 layout <- c(
   area(1, 1), area(1, 2), area(1, 3), area(1, 4), area(1, 5), area(1, 6), 
   area(2,1,2,6),
